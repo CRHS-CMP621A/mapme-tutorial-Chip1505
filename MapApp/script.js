@@ -32,16 +32,7 @@ navigator.geolocation.getCurrentPosition(
             const lng= mapEvent.latlng.lng
             console.log(mapEvent)
     
-                L.marker([lat, lng]).addTo(map)
-                    .bindPopup(L.popup({
-                        maxWidth:250,
-                        minWidth:100,
-                        autoClose:false,
-                        closeOnClick:false,
-                        className:'running-popup',
-                    }))
-                    .setPopupContent('Workout')
-                    .openPopup();
+    
                 
             form.classList.remove('hidden');
             inputDistance.focus();
@@ -56,5 +47,19 @@ navigator.geolocation.getCurrentPosition(
 
 // form event listener to check if submitted/completed
 form.addEventListener('submit', function(e){
+    const lat= mapEvent.latlng.lat
+    const lng= mapEvent.latlng.lng
+
+    L.marker([lat, lng]).addTo(map)
+    .bindPopup(L.popup({
+        maxWidth:250,
+        minWidth:100,
+        autoClose:false,
+        closeOnClick:false,
+        className:'running-popup',
+    }))
+    .setPopupContent('Workout')
+    .openPopup();
+
     e.preventDefault()
 })
