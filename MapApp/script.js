@@ -32,10 +32,13 @@ navigator.geolocation.getCurrentPosition(
             const lng= mapEvent.latlng.lng
             console.log(mapEvent)
     
-    
-                
             form.classList.remove('hidden');
             inputDistance.focus();
+
+            inputDistance.value = null
+            inputCadence.value = null
+            inputDuration.value = null
+            inputType.value = 'running'
         })
 
         
@@ -60,6 +63,8 @@ form.addEventListener('submit', function(e){
     }))
     .setPopupContent('Workout')
     .openPopup();
+
+    
 
     e.preventDefault()
 })
