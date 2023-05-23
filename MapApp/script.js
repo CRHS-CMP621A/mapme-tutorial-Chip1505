@@ -14,6 +14,32 @@ const inputElevation = document.querySelector('.form__input--elevation');
 let map;
 let mapEvent;
 
+////////CLASSES/////////
+class Workout{
+    date = new Date();
+    id = (Date.now() + '').slice(-10);
+
+    constructor(coors, distance, duration){
+        this.coords = coords;
+        this.distance = distance;
+        this.duration = duration;
+    }
+}
+
+class Running extends Workout{
+    constructor(coords, distance, duration, cadence){
+        super(coords, distance, duration);
+        this.cadence = cadence;
+    }
+}
+
+class Cycling extends Workout{
+    constructor(coords, distance, duration, elevationGain){
+        super(coords, distance, duration);
+        this.elevation = elevationGain;
+    }
+}
+
 navigator.geolocation.getCurrentPosition(
     function(position){
         const latitude = position.coords.latitude;
@@ -50,8 +76,33 @@ navigator.geolocation.getCurrentPosition(
 
 // form event listener to check if submitted/completed
 form.addEventListener('submit', function(e){
+    e.preventDefault()
+
+    
+    const type = inputType.value;
+    const distance = Number(inputDistance.value);
+    const duration = Number(inputDuration.value);
     const lat= mapEvent.latlng.lat
     const lng= mapEvent.latlng.lng
+
+    let workout;
+
+    if(type === 'running'){
+        const cadence = Number(inputCadence.value);
+
+        workout = new Running([lat,lng],distance,duration,cadence);
+    }
+
+    if(type === 'cycling'){
+        const elevation = +inputElevation.value;
+
+        workout = new Cycling([lat,lng],distance,duration,elevation);
+    }
+
+    workouts.push(workout)
+
+    e.preventDefault()
+
 
     L.marker([lat, lng]).addTo(map)
     .bindPopup(L.popup({
@@ -63,8 +114,10 @@ form.addEventListener('submit', function(e){
     }))
     .setPopupContent('Workout')
     .openPopup();
-
-    
-
-    e.preventDefault()
 })
+
+inputType.addEventListener('change', function(){
+    inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+ })
+ 
