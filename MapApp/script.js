@@ -10,6 +10,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+let workouts = [];
 
 let map;
 let mapEvent;
@@ -19,7 +20,7 @@ class Workout{
     date = new Date();
     id = (Date.now() + '').slice(-10);
 
-    constructor(coors, distance, duration){
+    constructor(coords, distance, duration){
         this.coords = coords;
         this.distance = distance;
         this.duration = duration;
@@ -27,16 +28,42 @@ class Workout{
 }
 
 class Running extends Workout{
+    type = 'Running';
+
     constructor(coords, distance, duration, cadence){
         super(coords, distance, duration);
         this.cadence = cadence;
+        this.calcPace();
+        this.setDescription();
+    }
+
+    calcPace(){
+        this.pace = this.duration / this.distance;
+        return this.pace
+    }
+
+    setDescription(){
+        this.description = `${this.type} on ${this.date.toDateString()}`;
     }
 }
 
 class Cycling extends Workout{
+    type = 'Cycling';
+
     constructor(coords, distance, duration, elevationGain){
         super(coords, distance, duration);
         this.elevation = elevationGain;
+        this.calcSpeed();
+        this.setDescription();
+    }
+
+    calcSpeed(){
+        this.speed = this.distance / this.duration;
+        return this.speed
+    }
+
+    setDescription(){
+        this.description = `${this.type} on ${this.date.toDateString()}`;
     }
 }
 
@@ -86,6 +113,7 @@ form.addEventListener('submit', function(e){
     const lng= mapEvent.latlng.lng
 
     let workout;
+    let html;
 
     if(type === 'running'){
         const cadence = Number(inputCadence.value);
@@ -101,9 +129,6 @@ form.addEventListener('submit', function(e){
 
     workouts.push(workout)
 
-    e.preventDefault()
-
-
     L.marker([lat, lng]).addTo(map)
     .bindPopup(L.popup({
         maxWidth:250,
@@ -114,10 +139,68 @@ form.addEventListener('submit', function(e){
     }))
     .setPopupContent('Workout')
     .openPopup();
+
+    if(type === "running"){
+        html = `<li class="workout workout--running" data-id=${workout.id}>
+    <h2 class="workout__title">${workout.description}</h2>
+    <div class="workout__details">
+      <span class="workout__icon">🏃‍♂️</span>
+      <span class="workout__value">${workout.distance}</span>
+      <span class="workout__unit">km</span>
+    </div>
+    <div class="workout__details">
+      <span class="workout__icon">⏱</span>
+      <span class="workout__value">${workout.duration}</span>
+      <span class="workout__unit">min</span>
+    </div>
+    <div class="workout__details">
+      <span class="workout__icon">⚡️</span>
+      <span class="workout__value">${workout.pace}</span>
+      <span class="workout__unit">min/km</span>
+    </div>
+    <div class="workout__details">
+      <span class="workout__icon">🦶🏼</span>
+      <span class="workout__value">${workout.cadence}</span>
+      <span class="workout__unit">spm</span>
+    </div>
+   </li>`;
+    }
+   
+   html += `<li class="workout workout--cycling" data-id=${workout.id}>
+   <h2 class="workout__title">${workout.description}</h2>
+   <div class="workout__details">
+    <span class="workout__icon">🚴‍♀️</span>
+    <span class="workout__value">${workout.distance}</span>
+    <span class="workout__unit">km</span>
+   </div>
+   <div class="workout__details">
+    <span class="workout__icon">⏱</span>
+    <span class="workout__value">${workout.duration}</span>
+    <span class="workout__unit">min</span>
+   </div>
+   <div class="workout__details">
+    <span class="workout__icon">⚡️</span>
+    <span class="workout__value">${workout.speed}</span>
+    <span class="workout__unit">km/h</span>
+   </div>
+   <div class="workout__details">
+    <span class="workout__icon">⛰</span>
+    <span class="workout__value">${workout.elevationGain}</span>
+    <span class="workout__unit">m</span>
+   </div>
+   </li>`;
+   
+   form.insertAdjacentHTML("afterend",html);
+   
 })
 
 inputType.addEventListener('change', function(){
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
     inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
  })
+
+ 
+ 
+
+ 
  
